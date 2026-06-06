@@ -2,6 +2,8 @@
 
 A browser-based 3D spatial editor for modelling physical environments and exporting structured context that AI agents can understand. Built with React, Three.js (via React Three Fiber), and Zustand.
 
+**Live editor:** https://npuckett.github.io/spatial-context-modeller/
+
 ## What It Does
 
 Spatial Context Modeller lets you build a 3D representation of a physical space -- rooms, sensors, cameras, light panels, tracking zones -- and define relationships between objects. The scene can be exported as a structured context description ready to paste into an AI agent prompt, giving the agent full spatial awareness of your environment.
@@ -141,3 +143,23 @@ src/
 - **Three.js** (via `@react-three/fiber` + `@react-three/drei`) -- 3D rendering
 - **Zustand** (with Immer middleware) -- State management with undo/redo
 - **Vite** -- Dev server and build tool
+
+## Deployment
+
+The editor is hosted as a static site on GitHub Pages.
+
+- **URL:** https://npuckett.github.io/spatial-context-modeller/
+- **Source:** `main` branch
+- **Workflow:** `.github/workflows/deploy.yml` -- on every push to `main`, it installs deps, runs `vite build`, and deploys the `dist/` folder via the official GitHub Pages Actions.
+- **Vite base path:** `vite.config.js` is configured with `base: '/spatial-context-modeller/'` so bundled asset URLs resolve correctly under the repo subpath on Pages.
+
+### One-time setup
+
+In the GitHub repo: **Settings → Pages → Source → "GitHub Actions"**. After that, every push to `main` automatically redeploys.
+
+### Local preview of the production build
+
+```bash
+npm run build
+npm run preview
+```
