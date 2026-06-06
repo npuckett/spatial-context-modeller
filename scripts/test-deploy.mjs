@@ -114,6 +114,7 @@ if (!chromePath) {
   if (puppeteer) {
     const pageErrors = []
     const consoleErrors = []
+    const consoleWarns = []
     const failedRequests = []
     let browser
     try {
@@ -134,6 +135,7 @@ if (!chromePath) {
       page.on('pageerror', e => pageErrors.push(e.message))
       page.on('console', msg => {
         if (msg.type() === 'error') consoleErrors.push(msg.text())
+        if (msg.type() === 'warning' || msg.type() === 'warn') consoleWarns.push(msg.text())
       })
       page.on('requestfailed', req => {
         const reason = req.failure()?.errorText || 'unknown'
@@ -174,6 +176,10 @@ if (!chromePath) {
           const reqUrl = r.split(' — ')[0]
           if (/\/favicon\.ico(\?|$|#)/.test(reqUrl)) warn(`failed request (non-critical): ${r}`)
           else fail(`failed request: ${r}`)
+        }
+        for (const w of consoleWarns) {
+          if (isEnvironmentalWarning(w)) { /* swallowed: headless-Chrome-only noise */ }
+          else warn(`console.warn: ${w}`)
         }
         if (pageErrors.length === 0 && consoleErrors.length === 0 && failedRequests.length === 0) {
           pass('no runtime JS errors or failed requests')
@@ -233,4 +239,13 @@ function isEnvironmentalError(msg) {
   return /WebGL/i.test(msg)
         || /GPU process/i.test(msg)
         || /SwiftShader/i.test(msg)
+}
+
+function isEnvironmentalWarning(msg) {
+  // Warnings that only appear in headless / sandboxed Chrome.
+  return /SwiftShader/i.test(msg)
+        || /GPU process/i.test(msg)
+        || /WebGL-0x.*GL Driver Message/i.test(msg)
+        || /GPU stall due to ReadPixels/i.test(msg)
+        || /headless/i.test(msg)
 }
