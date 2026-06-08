@@ -13,6 +13,7 @@ import Toolbar from './components/Toolbar'
 import Inspector from './components/Inspector'
 import JsonPanel from './components/JsonPanel'
 import TopBar from './components/TopBar'
+import SvgAnnotator from './components/SvgAnnotator'
 import useStore from './store'
 import './App.css'
 
@@ -23,12 +24,17 @@ export default function App() {
   const selectedId = useStore(s => s.selectedId)
   const deselect = useStore(s => s.deselect)
   const setTransformMode = useStore(s => s.setTransformMode)
+  const annotationMode = useStore(s => s.annotationMode)
+  const exitAnnotationMode = useStore(s => s.exitAnnotationMode)
 
   // Keyboard shortcuts
   useEffect(() => {
     function handleKey(e) {
       // Don't capture when typing in inputs
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return
+
+      // Skip 3D shortcuts when annotation mode is active (SvgAnnotator handles its own)
+      if (annotationMode.active) return
 
       if ((e.metaKey || e.ctrlKey) && e.key === 'z') {
         e.preventDefault()
@@ -51,7 +57,7 @@ export default function App() {
     }
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
-  }, [undo, redo, removeObject, selectedId, deselect, setTransformMode])
+  }, [undo, redo, removeObject, selectedId, deselect, setTransformMode, annotationMode.active])
 
   return (
     <div className="app">
@@ -64,6 +70,7 @@ export default function App() {
         </div>
         <Inspector />
       </div>
+      <SvgAnnotator />
     </div>
   )
 }

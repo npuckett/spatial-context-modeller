@@ -43,7 +43,12 @@ export function generateId() {
  *  - sensor: directional sensor (cone shape — distance sensor, mic, etc.)
  *  - camera: camera with field-of-view frustum
  */
-export const OBJECT_TYPES = ['box', 'plane', 'point', 'zone', 'group', 'mesh', 'sensor', 'camera']
+export const OBJECT_TYPES = ['box', 'plane', 'point', 'zone', 'group', 'mesh', 'sensor', 'camera', 'svgPlan']
+
+/**
+ * Orientation types for SVG plan drawings
+ */
+export const ORIENTATION_TYPES = ['plan', 'elevation-front', 'elevation-side', 'section']
 
 /**
  * Roles determine how an object functions within an interactive system:
@@ -117,6 +122,25 @@ export function createObject(type, overrides = {}) {
       base.range = 500
       base.aspect = 1.78
       base.tags = { role: 'sensor' }
+      break
+    case 'svgPlan':
+      base.svgContent = ''
+      base.svgFileName = ''
+      base.orientation = 'plan'
+      base.svgScale = null
+      base.svgOrigin = { x: 0, y: 0 }
+      base.svgDimensions = [0, 0]
+      base.opacity = 0.8
+      base.annotations = {}
+      base.elementGroups = []
+      base.planContext = {
+        coordSystem: '',
+        trackingMethod: '',
+        trackingDetails: '',
+        interactions: '',
+        additionalNotes: '',
+      }
+      base.tags = { role: 'reference' }
       break
   }
 

@@ -18,6 +18,9 @@ const useStore = create(
     selectedId: null,
     transformMode: 'translate', // 'translate' | 'rotate' | 'scale'
 
+    // --- SVG Annotation mode ---
+    annotationMode: { active: false, planId: null },
+
     // --- History ---
     history: [],
     historyIndex: -1,
@@ -182,6 +185,72 @@ const useStore = create(
       get()._pushHistory(`Edit JSON`)
       set(state => {
         state.scene = sceneData
+      })
+    },
+
+    // --- SVG Annotation Mode ---
+    enterAnnotationMode(planId) {
+      set(state => {
+        state.annotationMode = { active: true, planId }
+        state.selectedId = planId
+      })
+    },
+
+    exitAnnotationMode() {
+      set(state => {
+        state.annotationMode = { active: false, planId: null }
+      })
+    },
+
+    updateSvgAnnotation(planId, elementId, metadata) {
+      get()._pushHistory('Update SVG annotation')
+      set(state => {
+        const obj = state.scene.objects.find(o => o.id === planId)
+        if (!obj || obj.type !== 'svgPlan') return
+        if (!obj.annotations) obj.annotations = {}
+        obj.annotations[elementId] = { ...(obj.annotations[elementId] || {}), ...metadata }
+      })
+    },
+
+    removeSvgAnnotation(planId, elementId) {
+      get()._pushHistory('Remove SVG annotation')
+      set(state => {
+        const obj = state.scene.objects.find(o => o.id === planId)
+        if (!obj || obj.type !== 'svgPlan') return
+        delete obj.annotations[elementId]
+      })
+    },
+
+    addSvgElementGroup(planId, group) {
+      get()._pushHistory('Add SVG group')
+      set(state => {
+        const obj = state.scene.objects.find(o => o.id === planId)
+        if (!obj || obj.type !== 'svgPlan') return
+        if (!obj.elementGroups) obj.elementGroups = []
+        obj.elementGroups.push(group)
+      })
+    },
+
+    removeSvgElementGroup(planId, groupId) {
+      get()._pushHistory('Remove SVG group')
+      set(state => {
+        const obj = state.scene.objects.find(o => o.id === planId)
+        if (!obj || obj.type !== 'svgPlan') return
+        obj.elementGroups = obj.elementGroups.filter(g => g.id !== groupId)
+        // Remove group references from annotations
+        Object.values(obj.annotations || {}).forEach(ann => {
+          if (ann.dataGroup === groupId) ann.dataGroup = ''
+        })
+      })
+    },
+
+    updateSvgPlanCalibration(planId, calibration) {
+      get()._pushHistory('Update SVG calibration')
+      set(state => {
+        const obj = state.scene.objects.find(o => o.id === planId)
+        if (!obj || obj.type !== 'svgPlan') return
+        if (calibration.svgScale !== undefined) obj.svgScale = calibration.svgScale
+        if (calibration.svgOrigin !== undefined) obj.svgOrigin = calibration.svgOrigin
       })
     },
 

@@ -7,7 +7,7 @@
 
 import React, { useState, useCallback } from 'react'
 import useStore from '../store'
-import { ROLES, ROLE_COLORS, RELATION_TYPES } from '../schema'
+import { ROLES, ROLE_COLORS, RELATION_TYPES, ORIENTATION_TYPES } from '../schema'
 
 export default function Inspector() {
   const selectedId = useStore(s => s.selectedId)
@@ -259,6 +259,10 @@ function ObjectInspector({ obj, scene }) {
         </div>
       )}
 
+      {obj.type === 'svgPlan' && (
+        <SvgPlanInspector obj={obj} update={update} />
+      )}
+
       {/* Tags */}
       <div className="inspector-section">
         <div className="inspector-section-title">Tags</div>
@@ -303,6 +307,83 @@ function ObjectInspector({ obj, scene }) {
         </button>
       </div>
     </>
+  )
+}
+
+/**
+ * SVG Plan property inspector
+ */
+function SvgPlanInspector({ obj, update }) {
+  const enterAnnotationMode = useStore(s => s.enterAnnotationMode)
+  const annotationCount = Object.keys(obj.annotations || {}).length
+  const groupCount = (obj.elementGroups || []).length
+
+  return (
+    <div className="inspector-section">
+      <div className="inspector-section-title">SVG Plan</div>
+      <div className="inspector-field">
+        <label>File</label>
+        <span style={{ fontSize: 11, color: '#a0a0b0' }}>{obj.svgFileName || '—'}</span>
+      </div>
+      <div className="inspector-field">
+        <label>Size (px)</label>
+        <span style={{ fontSize: 11, color: '#a0a0b0' }}>
+          {obj.svgDimensions ? `${obj.svgDimensions[0]} × ${obj.svgDimensions[1]}` : '—'}
+        </span>
+      </div>
+      <div className="inspector-field">
+        <label>Orientation</label>
+        <select
+          value={obj.orientation || 'plan'}
+          onChange={e => update({ orientation: e.target.value })}
+        >
+          {ORIENTATION_TYPES.map(o => (
+            <option key={o} value={o}>{o}</option>
+          ))}
+        </select>
+      </div>
+      <div className="inspector-field">
+        <label>Opacity</label>
+        <input
+          type="range"
+          min="0.1"
+          max="1"
+          step="0.05"
+          value={obj.opacity ?? 0.8}
+          onChange={e => update({ opacity: parseFloat(e.target.value) })}
+          style={{ flex: 1 }}
+        />
+        <span style={{ fontSize: 11, color: '#a0a0b0', width: 30 }}>
+          {Math.round((obj.opacity ?? 0.8) * 100)}%
+        </span>
+      </div>
+      <div className="inspector-field">
+        <label>Scale</label>
+        <span style={{ fontSize: 11, color: '#a0a0b0' }}>
+          {obj.svgScale ? `${obj.svgScale.toFixed(1)} px/unit` : 'Not calibrated'}
+        </span>
+      </div>
+      <div className="inspector-field">
+        <label>Origin</label>
+        <span style={{ fontSize: 11, color: '#a0a0b0' }}>
+          {obj.svgOrigin ? `${Math.round(obj.svgOrigin.x)}, ${Math.round(obj.svgOrigin.y)}` : 'Not set'}
+        </span>
+      </div>
+      <div className="inspector-field">
+        <label>Annotated</label>
+        <span style={{ fontSize: 11, color: '#a0a0b0' }}>{annotationCount} elements</span>
+      </div>
+      <div className="inspector-field">
+        <label>Groups</label>
+        <span style={{ fontSize: 11, color: '#a0a0b0' }}>{groupCount}</span>
+      </div>
+      <button
+        onClick={() => enterAnnotationMode(obj.id)}
+        style={{ width: '100%', marginTop: 8, background: '#1a3a5a', borderColor: '#2a5a8a' }}
+      >
+        Open Annotator
+      </button>
+    </div>
   )
 }
 

@@ -14,6 +14,7 @@ import { Text } from '@react-three/drei'
 import * as THREE from 'three'
 import useStore from '../store'
 import { ROLE_COLORS } from '../schema'
+import SvgPlanObject from './SvgPlanObject'
 
 function getColor(obj) {
   const role = obj.tags?.role || 'default'
@@ -25,6 +26,7 @@ function getColor(obj) {
  */
 function SceneObject({ obj }) {
   const select = useStore(s => s.select)
+  const enterAnnotationMode = useStore(s => s.enterAnnotationMode)
   const selectedId = useStore(s => s.selectedId)
   const isSelected = selectedId === obj.id
   const color = getColor(obj)
@@ -35,6 +37,13 @@ function SceneObject({ obj }) {
     select(obj.id)
   }, [obj.id, select])
 
+  const handleDoubleClick = useCallback((e) => {
+    e.stopPropagation()
+    if (obj.type === 'svgPlan') {
+      enterAnnotationMode(obj.id)
+    }
+  }, [obj.id, obj.type, enterAnnotationMode])
+
   const pos = obj.position || [0, 0, 0]
   const rot = (obj.rotation || [0, 0, 0]).map(d => d * Math.PI / 180)
 
@@ -43,6 +52,7 @@ function SceneObject({ obj }) {
     position: pos,
     rotation: rot,
     onClick: handleClick,
+    onDoubleClick: handleDoubleClick,
   }
 
   return (
@@ -73,6 +83,7 @@ function getLabelOffset(obj) {
     const s = obj.scale || [1, 1, 1]
     return ((obj.geometry?.size?.[1] || 100) / 2) * s[1] + 8
   }
+  if (obj.type === 'svgPlan') return 15
   if (obj.type === 'sensor') return 10
   if (obj.type === 'camera') return 12
   return 15
@@ -96,6 +107,8 @@ function renderByType(obj, props, color, isSelected) {
       return <SensorObject obj={obj} color={color} isSelected={isSelected} {...props} />
     case 'camera':
       return <CameraObject obj={obj} color={color} isSelected={isSelected} {...props} />
+    case 'svgPlan':
+      return <SvgPlanObject obj={obj} color={color} isSelected={isSelected} {...props} />
     default:
       return null
   }

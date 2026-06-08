@@ -516,3 +516,276 @@
   border-radius: 3px;
   font-size: 11px;
 }
+
+/* ===== SVG Annotator Overlay ===== */
+
+.svg-annotator-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: #0a0a14;
+  display: flex;
+  flex-direction: column;
+}
+
+.svg-annotator-header {
+  height: 40px;
+  background: #16162a;
+  border-bottom: 1px solid #2a2a4a;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.svg-annotator-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #c0c0e0;
+}
+
+.svg-annotator-coords {
+  font-size: 11px;
+  color: #707090;
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+}
+
+.svg-annotator-header-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 6px;
+}
+
+.svg-annotator-header-actions button {
+  background: #2a2a4a;
+  border: 1px solid #3a3a5a;
+  color: #c0c0e0;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.svg-annotator-header-actions button:hover {
+  background: #3a3a6a;
+}
+
+.svg-annotator-body {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+/* Left panel */
+.svg-annotator-left {
+  width: 180px;
+  background: #12122a;
+  border-right: 1px solid #2a2a4a;
+  overflow-y: auto;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.svg-annotator-tools {
+  padding: 8px;
+  border-bottom: 1px solid #2a2a4a;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.svg-annotator-tools button {
+  background: #2a2a4a;
+  border: 1px solid #3a3a5a;
+  color: #c0c0e0;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.svg-annotator-tools button:hover {
+  background: #3a3a6a;
+}
+
+.svg-annotator-tools button.active {
+  background: #4060a0;
+  border-color: #5080c0;
+}
+
+.svg-annotator-groups {
+  padding: 8px;
+  border-bottom: 1px solid #2a2a4a;
+}
+
+.svg-annotator-groups button {
+  background: #2a2a4a;
+  border: 1px solid #3a3a5a;
+  color: #c0c0e0;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.svg-annotator-groups button:hover {
+  background: #3a3a6a;
+}
+
+.svg-group-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
+  font-size: 11px;
+}
+
+.svg-group-color {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.svg-group-name {
+  flex: 1;
+  color: #c0c0e0;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.svg-group-name:hover {
+  color: #ffffff;
+}
+
+.svg-group-count {
+  color: #606080;
+  font-size: 10px;
+}
+
+.svg-annotator-stats {
+  padding: 8px;
+}
+
+/* Center canvas */
+.svg-annotator-canvas {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  background: #1a1a2e;
+  background-image:
+    linear-gradient(45deg, #16162a 25%, transparent 25%),
+    linear-gradient(-45deg, #16162a 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #16162a 75%),
+    linear-gradient(-45deg, transparent 75%, #16162a 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
+
+.svg-annotator-svg-container {
+  display: inline-block;
+}
+
+.svg-annotator-svg-container svg {
+  display: block;
+  max-width: none;
+}
+
+.svg-annotator-zoom {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(26, 26, 46, 0.9);
+  border: 1px solid #2a2a4a;
+  border-radius: 6px;
+  padding: 4px 8px;
+}
+
+.svg-annotator-zoom button {
+  background: #2a2a4a;
+  border: 1px solid #3a3a5a;
+  color: #c0c0e0;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.svg-annotator-zoom button:hover {
+  background: #3a3a6a;
+}
+
+.svg-annotator-zoom span {
+  font-size: 11px;
+  color: #808090;
+  min-width: 40px;
+  text-align: center;
+}
+
+/* Right panel */
+.svg-annotator-right {
+  width: 240px;
+  background: #12122a;
+  border-left: 1px solid #2a2a4a;
+  overflow-y: auto;
+  flex-shrink: 0;
+  padding: 8px 12px;
+}
+
+.svg-annotator-right .inspector-field {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+  gap: 8px;
+}
+
+.svg-annotator-right .inspector-field label {
+  font-size: 11px;
+  color: #808090;
+  width: 60px;
+  flex-shrink: 0;
+}
+
+.svg-annotator-right .inspector-field input,
+.svg-annotator-right .inspector-field select {
+  flex: 1;
+  background: #1a1a2e;
+  border: 1px solid #2a2a4a;
+  color: #d0d0e0;
+  padding: 4px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-family: inherit;
+}
+
+.svg-annotator-right .inspector-field input:focus,
+.svg-annotator-right .inspector-field select:focus {
+  outline: none;
+  border-color: #4060a0;
+}
+
+.svg-annotator-right button {
+  background: #2a2a4a;
+  border: 1px solid #3a3a5a;
+  color: #c0c0e0;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.svg-annotator-right button:hover {
+  background: #3a3a6a;
+}

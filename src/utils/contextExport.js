@@ -104,5 +104,60 @@ export function exportSceneContext(scene) {
   lines.push(`Total objects: ${scene.objects.length}`)
   lines.push(`Total relationships: ${scene.references?.length || 0}`)
 
+  // --- 2D Plans & Drawings ---
+  const svgPlans = scene.objects.filter(o => o.type === 'svgPlan')
+  if (svgPlans.length > 0) {
+    lines.push('')
+    lines.push('## 2D Plans & Drawings')
+    lines.push('')
+
+    for (const plan of svgPlans) {
+      lines.push(`### ${plan.name}`)
+      lines.push(`  Orientation: ${plan.orientation || 'plan'}`)
+      lines.push(`  File: ${plan.svgFileName || 'unknown'}`)
+      lines.push(`  Dimensions: ${plan.svgDimensions?.[0] || 0} × ${plan.svgDimensions?.[1] || 0} px`)
+      if (plan.svgScale) lines.push(`  Scale: ${plan.svgScale.toFixed(1)} px/unit`)
+      if (plan.svgOrigin) lines.push(`  Origin: (${Math.round(plan.svgOrigin.x)}, ${Math.round(plan.svgOrigin.y)})`)
+      if (plan.position) lines.push(`  3D Position: (${plan.position.join(', ')})`)
+
+      // Plan context documentation
+      const ctx = plan.planContext || {}
+      if (ctx.coordSystem) lines.push(`  Coordinate System: ${ctx.coordSystem}`)
+      if (ctx.trackingMethod) lines.push(`  Tracking: ${ctx.trackingMethod}`)
+      if (ctx.trackingDetails) lines.push(`  Tracking Details: ${ctx.trackingDetails}`)
+      if (ctx.interactions) lines.push(`  Interactions: ${ctx.interactions}`)
+      if (ctx.additionalNotes) lines.push(`  Notes: ${ctx.additionalNotes}`)
+
+      // Element groups
+      const groups = plan.elementGroups || []
+      if (groups.length > 0) {
+        lines.push('')
+        lines.push('  Groups:')
+        for (const g of groups) {
+          lines.push(`    ${g.name} (${g.elementIds.length} elements)`)
+        }
+      }
+
+      // Annotated elements table
+      const annotations = plan.annotations || {}
+      const annotatedIds = Object.keys(annotations)
+      if (annotatedIds.length > 0) {
+        lines.push('')
+        lines.push('  Annotated Elements:')
+        lines.push('  | ID | data-type | data-zone | data-layer | Tags | Group |')
+        lines.push('  |---|---|---|---|---|---|')
+        for (const elId of annotatedIds) {
+          const ann = annotations[elId]
+          const groupName = groups.find(g => g.id === ann.dataGroup)?.name || ''
+          const tags = (ann.dataTags || []).join(', ')
+          lines.push(`  | ${elId} | ${ann.dataType || ''} | ${ann.dataZone || ''} | ${ann.dataLayer || ''} | ${tags} | ${groupName} |`)
+        }
+      }
+      lines.push('')
+    }
+
+    lines.push(`Total SVG plans: ${svgPlans.length}`)
+  }
+
   return lines.join('\n')
 }
